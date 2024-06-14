@@ -20,7 +20,7 @@ a.  $(A+B)^T=A^T+B^T$
 b.  $(AB)^T=B^TA^T$
 c.  $(xA)^T=xA^T$
 d.  $(Ax)^T=x^TA^T$
-e.  $(A^{-1})^T=(A^T)^{-1}
+e.  \$(A^{-1})^T=(A^T)^{-1}
 
 <!-- -->
 
@@ -116,4 +116,50 @@ See slides 16-19 for why $\text{Cov}(\hat{\epsilon})=\sigma^2(I-P_X)=\mathbb{E}(
 
 In the general case, we may not have invertible $X$. In such cases, the normal equation is still $X^TX\beta=X^Ty$, but we now use a **generalized inverse (g-inverse)** to come up with our estimate. A matrix $G$ is called a g-inverse of a matrix $A$ if and only if $AGA=A$, and every matrix $A$ has a (non-unique) g-inverse. So while our predicted response for models where $X$ is not invertible is $\hat{y}=X\hat{\beta}$ where $\hat{\beta}=(X^TX)^-X^Ty$, even though $(X^TX)^-$ is not unique, $X(X^TX)^-X^T$ is (no matter the choice of $\hat{\beta}$, $\hat{y}$ is unique). The residuals and estimator of $\sigma^2$ are also unique.
 
+### Comparing R Estimates To Derived Estimates
 
+Our ordinary least-squares solution for a Gauss-Markov model was shown to be $\hat{\beta}=(X^TX)^{-1}X^T y$. Let's verify that the regression coefficients we get from R match these values.
+
+```{r}
+library(faraway)
+gamble_regression=lm(gamble ~ ., data=teengamb) #all variables predictors#
+X=model.matrix(gamble~., data=teengamb) 
+y=teengamb$gamble
+
+bhat=solve(t(X) %*% X) %*% t(X) %*%y
+compare_coef=data.frame(direct=bhat, lm=gamble_regression$coefficients)
+compare_coef
+
+```
+
+Great, now that we've shown that our estimate $\hat{\beta}$ matches up, we may be interested in the standard error of our estimate. We first need to compute our estimate of $\hat{sigma^2}$, which we showed earlier was $\frac{\hat{\epsilon}^T\hat{\epsilon}}{n-\text{rank}(X)}$. We verify our calculations match with the following.
+
+```{r}
+res=gamble_regression$residual #observed less predicted#
+SSE=sum(res^2)
+n=nrow(X)                      #X is the model matrix defined above#
+r=qr(X)$rank
+sigmasqrhat=SSE/(n-r)
+sigmahat=sqrt(sigmasqrhat)
+
+compare_sigma=data.frame(direct=sigmahat, lm=summary(gamble_regression)$sigma)
+compare_sigma
+
+```
+
+With our estimate $\hat{\sigma^2}$ in hand, we can compute the standard error of our estimates of the regression coefficients. We have previously derived that $\text{Cov}(\hat{\beta})=\hat{\sigma^2}(X^TX)^{-1}$. The standard error of any element of $\hat{\beta}$ is found from the diagonal element of the covariance matrix (square root since the diagonal of the covariance matrix are the variances); $\text{SE}(\beta_i)=\hat{\sigma}\sqrt{(X^TX)^{-1}_{i,i}}$. We finally verify these match R with the following:
+
+```{r}
+sigmahat                                      #from above code chunk#
+beta_se=sigmahat*sqrt(diag(solve(t(X)%*%X)))  #X from previous code chunk#
+
+compare_se=data.frame(direct=beta_se, 
+                      lm=summary(gamble_regression)$coef[, "Std. Error"])
+compare_se
+```
+
+Note that while we could grab our regression coefficients $\hat{\beta}$ with `gamble_regression$coefficients`, our residual standard error with `summary(gamble_regression)$sigma`, and our standard errors with `summary(gamble_regression)$coef[, "Std. Error"]`, we can also read these directly off the summary from the first column, third to last row, and second column respectively.
+
+```{r}
+summary(gamble_regression)
+```
