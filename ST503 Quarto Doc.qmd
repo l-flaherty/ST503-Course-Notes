@@ -25,7 +25,7 @@ e.  \$(A^{-1})^T=(A^T)^{-1}
 <!-- -->
 
 4.  If a matrix $A$ in invertible, then $A^TA$ is also invertible. Thus when solving the system $Ax=b$ for full-rank $A$, we know $x=A^{-1}b=(A^TA)^{-1}A^Tb$
-5.  $\text{Cov}(Ay)=A \text{Cov}(y)A^T$
+5.  $\text{Cov}(Ay)=A \text{Cov}(y)A^T$ and $\mathbb{V}(A^Ty)=A^T \text{Cov}(y)A$.
 6.  $\text{Cov}(X,Y)=\mathbb{E}(XY)-\mathbb{E}(X)\mathbb{E}(Y)$. Since $\mathbb{V}(X)=\mathbb{E}(X^2)-\mathbb{E}(X)^2$, $\mathbb{V}(X)=\text{Cov}(X,X)$. If random variables are independent, then covariance is zero.
 7.  The covariance matrix of a vector $\epsilon$ is as expected: $\text{Cov}(\epsilon)=\begin{bmatrix}
     \mathbb{V}(\epsilon_1) & \text{Cov}(\epsilon_1, \epsilon_2) & \dots &  \text{Cov}(\epsilon_1, \epsilon_n)\\ &\mathbb{V}(\epsilon_2) & \dots &\text{Cov}(\epsilon_2, \epsilon_n) \\
@@ -76,7 +76,7 @@ qr(a)     #qr(a)$rank gives 2#
 1.  Least-squares: $y=X\beta+\epsilon$
 2.  Gauss-Markov: $y=X\beta+\epsilon$ where $\mathbb{E}(\epsilon)=0$ and $\text{Cov}(\epsilon)=\sigma^2 I$ (i.e. there is no covariance between epsilon terms).
 3.  Aitken Model: $y=X\beta+\epsilon$ where $\mathbb{E}(\epsilon)=0$ and $\text{Cov}(\epsilon)=\sigma^2 V$ for some known positive definite matrix $V$
-4.  One-Way ANOVA. Interested in if $\mu_1=\mu_2$. We can write $\mu_i=\mu+(\mu_i-\mu)=\mu+\alpha_i$. Then $\begin{bmatrix}y_{1_1} \\ \vdots \\ y_{1_{n}} \\ y_{2_1} \\ \vdots \\ y_{2_n}\end{bmatrix}=\begin{bmatrix} 1 & 0 \\ \vdots &\vdots \\ 1 & 0 \\ 0 & 1 \\ \vdots & \vdots \\ 0 & 1 \end{bmatrix} \begin{bmatrix} \mu_1 \\ \mu_2\end{bmatrix}+\begin{bmatrix} \epsilon_{1_1} \\ \vdots \\ \epsilon_{1_{n}} \\ \epsilon_{2_1} \\ \vdots \\ \epsilon_{2_n}\end{bmatrix}$
+4.  One-Way ANOVA. Interested in if $\mu_1=\mu_2$. We can write $\mu_i=\mu+(\mu_i-\mu)=\mu+\alpha_i$. Then $\begin{bmatrix}y_{1_1} \\ \vdots \\ y_{1_{n}} \\ y_{2_1} \\ \vdots \\ y_{2_n}\end{bmatrix}=\begin{bmatrix} 1 & 0 \\ \vdots &\vdots \\ 1 & 0 \\ 1 & 1 \\ \vdots & \vdots \\ 1 & 1 \end{bmatrix} \begin{bmatrix} \mu \\ \alpha_1\end{bmatrix}+\begin{bmatrix} \epsilon_{1_1} \\ \vdots \\ \epsilon_{1_{n}} \\ \epsilon_{2_1} \\ \vdots \\ \epsilon_{2_n}\end{bmatrix}$
 
 ### Example
 
@@ -162,4 +162,53 @@ Note that while we could grab our regression coefficients $\hat{\beta}$ with `ga
 
 ```{r}
 summary(gamble_regression)
+```
+
+### Estimability
+
+What values can be estimated with an unbiased estimator in a Gauss-Markov model? In essence, we are asking which **linera functions** of $\beta$, call them $c^T\beta$ for some vector $c$, are estimable. A **linear estimator** has the form $l^Ty$ for some vector $l$. Then the function $c^T\beta$ is **estimable** if and only if there is a linear estimator $l^Ty$ such that $\mathbb{E}(l^Ty)=c^T\beta$ for all $\beta$. Such estimators $l^Ty$ are called a **linear unbiased estimator (LUE)** of $c^T\beta$. 
+
+Suppose $c^T\beta$ is estimable. Then $\mathbb{E}(l^Ty)=c^T\beta \implies l^TX\beta=c^T\beta \implies l^TX=c^T$. In other words, $c^T\beta$ is estimable if and only if $c$ is in the column space of $X^T$ (the row space of $X$). Since the left null space is orthogonal to the row space, $c^T\beta$ is also estimable if and only if $C$ is orthogonal to the left null space.
+
+For an example, recall our ANOVA model: $\begin{bmatrix}y_{1_1} \\ \vdots \\ y_{1_{n}} \\ y_{2_1} \\ \vdots \\ y_{2_n} \\ y_{3_1} \\ \vdots \\ y_{3_n}\end{bmatrix}=\begin{bmatrix} 1 & 1 &0  \\ \vdots &\vdots &\vdots \\ 1 & 1 &0 \\ 1 & 0&1 \\ \vdots & \vdots &\vdots \\ 1 & 0 &1\end{bmatrix} \begin{bmatrix} \mu \\ \alpha_1 \\ \alpha_2\end{bmatrix}+\begin{bmatrix} \epsilon_{1_1} \\ \vdots \\ \epsilon_{1_{n}} \\ \epsilon_{2_1} \\ \vdots \\ \epsilon_{2_n} \\ \epsilon_{3_1} \\ \vdots \\ \epsilon_{3_n}\end{bmatrix}$. Note that $\mu+\alpha_1=\begin{bmatrix} 1&1&0\end{bmatrix}\begin{bmatrix} \mu \\ \alpha_1 \\ \alpha_2\end{bmatrix}=c^T\beta$ is estimable, since $c$ is in the row space of $X$ (it is the very first row). On the other hand, $\mu=\begin{bmatrix} 1&0&0\end{bmatrix}\begin{bmatrix} \mu \\ \alpha_1 \\ \alpha_2\end{bmatrix}$ is not estimable, since the row space of $X$ is $\text{span}\left\{\begin{pmatrix}1\\1\\0\end{pmatrix}^T, \begin{pmatrix}0\\0\\1\end{pmatrix}^T\right\}$. 
+
+If $c^T\beta$ is estimable, then $c^T\hat{\beta}$ is a LUE. linear since $c^T\hat{\beta}=c^T(C^TC)^-C^Ty=l^Ty$. Unbiased since $\mathbb{E}(c^T\hat{\beta})=\mathbb{E}(l^TX\hat{\beta})=\mathbb{E}(l^T\hat{y})=l^T\mathbb{E}(\hat{y})=l^TX\beta=c^T\beta$. Look at pages 6 and 7 on week 3 A to see $\mathbb{V}(c^T\beta)=c^T\sigma^2(X^TX)^-c$.
+
+
+
+### Checking estimability with R
+
+There is a package `estimability` in R that helps determine the estimability of linear function of $\beta$. 
+
+```{r}
+library(estimability)
+
+X=cbind(rep(1,5), 1:5, 5:1, 2:6)
+cvec1=c(1,4,2,5)        #so, c^T\beta=1\beta_0+4\beta_1+...#
+nb=nonest.basis(X)     #some basis vectors of left null space#
+is.estble(cvec1, nb)
+
+cvec2=c(1,2,2,1)
+is.estble(cvec2, nb)
+
+```
+
+
+The key here is the `is.estble` function, which requires we come up with the left null space via the `nonest.basis` function. We can see that the basis generated by this function is indeed a basis for the left null space by direct computation (that the values aren't exactly zero is a storage/rounding error)
+
+```{r}
+nb
+t(X)[,1] %*% nb  #zero with computer rounding#
+```
+
+Likewise we see that the first linear function we tested, $c^T\beta=\beta_0+4\beta_1+2\beta_2+5\beta_3$, is indeed estimable, since it is orthogonal to the left null space of our model matrix $X$:
+
+```{r}
+t(cvec1) %*% nb   #zero with computer rounding#
+```
+
+On the otherhand, the second linear function we tested, $\beta_0+2\beta_1+2\beta_2+\beta_3$ is not estimable, since it isn't orthogonal to the left null space of $X$.
+
+```{r}
+t(cvec2) %*% nb
 ```
