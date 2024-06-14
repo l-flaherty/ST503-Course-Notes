@@ -4,23 +4,93 @@ format: html
 editor: visual
 ---
 
-## Quarto
+# Week 1
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+Our goal is to predict a response variable, call it $y$ (for example, the average velocity of a pitcher). To do so, we have predictive variables $x_1, x_2, \dots$ (for example, the height of the player, the weight of a player, etc.). To find the relationship between the response and predictors, we ideally have many different observations (many different players we observe). Loosely speaking, our goal in creating linear models is to find the coefficients $\beta_i$ to the predictors $x_i$ such that the error terms $\epsilon_i$ in the equation $y_i=\beta_0+\beta_1f(x_1)+\beta_2g(x_2)+\dots+\epsilon_i$ are minimized. The term 'linear' in 'linear models' refers to the fact that the aforementioned equation is linear *in the* $\beta_i$. When writing out each of our observations, we see that the system of equations can be written compactly in the matrix form $y=X\beta+\epsilon$.
 
-## Running Code
+### Matrix Review
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+1.  A matrix $A$ is positive definite if $x^TAx>0$ for all non-zero $x$.
+2.  The inner product of a vector with itself is $x^Tx=\sum x_i^2$.
+3.  The transpose rules for matrices $A,B$ and vectors $x$ are as follows:
+
+<!-- -->
+
+a.  $(A+B)^T=A^T+B^T$
+b.  $(AB)^T=B^TA^T$
+c.  $(xA)^T=xA^T$
+d.  $(Ax)^T=x^TA^T$
+
+<!-- -->
+
+4.  If a matrix $A$ in invertible, then $A^TA$ is also invertible. Thus when solving the system $Ax=b$ for full-rank $A$, we know $x=A^{-1}b=(A^TA)^{-1}A^Tb$
+5.  $\text{Cov}(Ay)=A \text{Cov}(y)A^T$
+6.  $\text{Cov}(X,Y)=\mathbb{E}(XY)-\mathbb{E}(X)\mathbb{E}(Y)$. Since $\mathbb{V}(X)=\mathbb{E}(X^2)-\mathbb{E}(X)^2$, $\mathbb{V}(X)=\text{Cov}(X,X)$. If random variables are independent, then covariance is zero.
+7.  The covariance matrix of a vector $\epsilon$ is as expected: $\text{Cov}(\epsilon)=\begin{bmatrix}
+    \mathbb{V}(\epsilon_1) & \text{Cov}(\epsilon_1, \epsilon_2) & \dots &  \text{Cov}(\epsilon_1, \epsilon_n)\\ &\mathbb{V}(\epsilon_2) & \dots &\text{Cov}(\epsilon_2, \epsilon_n) \\
+    \\ & & \ddots &\vdots \\ & & & \mathbb{V}(\epsilon_n) \end{bmatrix}$
+8.  The correlation $\rho$ between variables $X$ and $Y$ is $\frac{\text{Cov}(X,Y)}{\sqrt{\mathbb{V}(X)\mathbb{V}(Y)}}$
+
+### Handy R Code
+
+1.  We can find the transpose of a matrix with the `R` code `t(a)`. For example:
 
 ```{r}
-1 + 1
+a=matrix(c(1,3,2,4), nrow=2, byrow=TRUE)
+a
+t(a)
 ```
 
-You can add options to executable code like this
+2.  We can perform matrix multiplication with \`%\*%'. For example:
 
 ```{r}
-#| echo: false
-2 * 2
+b=matrix(1:4, nrow=2, byrow=TRUE)
+a %*% b
+
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+3.  We can find the inverse of a matrix with `solve`. For example:
+
+```{r}
+solve(a)
+a %*% solve(a)
+```
+
+4.  We can find the rank of a matrix with `qr` (for the QR decomposition). For example:
+
+```{r}
+qr(a)     #qr(a)$rank gives 2#
+```
+
+### Classes of Linear Models
+
+1.  Least-squares: $y=X\beta+\epsilon$
+2.  Gauss-Markov: $y=X\beta+\epsilon$ where $\mathbb{E}(\epsilon)=0$ and $\text{Cov}(\epsilon)=\sigma^2 I$ (i.e. there is no covariance between epsilon terms).
+3.  Aitken Model: $y=X\beta+\epsilon$ where $\mathbb{E}(\epsilon)=0$ and $\text{Cov}(\epsilon)=\sigma^2 V$ for some known positive definite matrix $V$
+4.  One-Way ANOVA. Interested in if $\mu_1=\mu_2$. We can write $\mu_i=\mu+(\mu_i-\mu)=\mu+\alpha_i$. Then $\begin{bmatrix}y_{1_1} \\ \vdots \\ y_{1_{n}} \\ y_{2_1} \\ \vdots \\ y_{2_n}\end{bmatrix}=\begin{bmatrix} 1 & 0 \\ \vdots &\vdots \\ 1 & 0 \\ 0 & 1 \\ \vdots & \vdots \\ 0 & 1 \end{bmatrix} \begin{bmatrix} \mu_1 \\ \mu_2\end{bmatrix}+\begin{bmatrix} \epsilon_{1_1} \\ \vdots \\ \epsilon_{1_{n}} \\ \epsilon_{2_1} \\ \vdots \\ \epsilon_{2_n}\end{bmatrix}$
+
+### Example
+
+We have data on the gambling habits of teenagers in England.
+
+```{r}
+library(faraway)
+summary(teengamb)
+str(teengamb)
+```
+
+We can try to predict the annual amount gambled by their weekly income.
+
+```{r}
+gamble_regression=lm(gamble ~ income, data=teengamb)
+summary(gamble_regression)
+```
+
+In such a simple model, we can just read off the estimates for $\beta_0$ (the intercept) and $\beta_1$ the coefficient for weekly income. We can also access them directly with the following:
+
+```{r}
+gambling_coef=gamble_regression$coefficients
+gambling_coef
+```
+
+All told, our model is $\begin{bmatrix}y_1\\ \vdots \\y_n \end{bmatrix}=\begin{bmatrix}1 & x_1\\ \vdots &\vdots\\1&x_n \end{bmatrix} \begin{bmatrix} -6.352\\5.52\end{bmatrix}+\begin{bmatrix}\epsilon_1\\ \vdots\\ \epsilon_n \end{bmatrix}$
