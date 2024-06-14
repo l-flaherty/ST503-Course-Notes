@@ -20,6 +20,7 @@ a.  $(A+B)^T=A^T+B^T$
 b.  $(AB)^T=B^TA^T$
 c.  $(xA)^T=xA^T$
 d.  $(Ax)^T=x^TA^T$
+e.  $(A^{-1})^T=(A^T)^{-1}
 
 <!-- -->
 
@@ -30,13 +31,14 @@ d.  $(Ax)^T=x^TA^T$
     \mathbb{V}(\epsilon_1) & \text{Cov}(\epsilon_1, \epsilon_2) & \dots &  \text{Cov}(\epsilon_1, \epsilon_n)\\ &\mathbb{V}(\epsilon_2) & \dots &\text{Cov}(\epsilon_2, \epsilon_n) \\
     \\ & & \ddots &\vdots \\ & & & \mathbb{V}(\epsilon_n) \end{bmatrix}$
 8.  The correlation $\rho$ between variables $X$ and $Y$ is $\frac{\text{Cov}(X,Y)}{\sqrt{\mathbb{V}(X)\mathbb{V}(Y)}}$
-9.  The projection of a vector $y$ onto the column space of $X$ is $y^*=P_Ay$ where $P_A$ is the projection matrix $A(A^TA)^{-1}A^T$.
-10. The norm of a vector $x$ is $\|x\|=\langle x, x \rangle=(x_1^2+\dots+x_n^2)^{\frac{1}{2}}$.
-11. Differentiating a scalar $v$ with respect to a vector $x$ returns a vector whose components are the partial derivatives with respect to each component of $x$, $\frac{d v}{dx}=\begin{bmatrix} \frac{\partial v}{\partial x_1} &\dots & \frac{\partial v}{\partial x_n}\end{bmatrix}^T$. This is called the **gradient**
-12. Differentiating a vector $x\in \mathbb{R}^n$ with respect to another vector $y \in \mathbb{R}^m$ returns an $m \times n$ matrix of partials called the **Jacobian Matrix**, $\frac{d x}{dy}=\begin{bmatrix} \frac{\partial x_1}{\partial y_1} & \dots &\frac{\partial x_n}{\partial y_1}\\ \vdots &\ddots & \vdots \\ \frac{\partial x_1}{\partial y_m} & \dots &\frac{\partial x_m}{\partial y_m}
+9.  The projection of a vector $y$ onto the column space of $A$ is $y^*=P_Ay$ where $P_A$ is the projection matrix $A(A^TA)^{-1}A^T$.
+10. Projection matrices are symmetric ($P_A=P_A^T$) and idempotent ($P_X^2=P_X$).
+11. The norm of a vector $x$ is $\|x\|=\langle x, x \rangle=(x_1^2+\dots+x_n^2)^{\frac{1}{2}}$.
+12. Differentiating a scalar $v$ with respect to a vector $x$ returns a vector whose components are the partial derivatives with respect to each component of $x$, $\frac{d v}{dx}=\begin{bmatrix} \frac{\partial v}{\partial x_1} &\dots & \frac{\partial v}{\partial x_n}\end{bmatrix}^T$. This is called the **gradient**
+13. Differentiating a vector $x\in \mathbb{R}^n$ with respect to another vector $y \in \mathbb{R}^m$ returns an $m \times n$ matrix of partials called the **Jacobian Matrix**, $\frac{d x}{dy}=\begin{bmatrix} \frac{\partial x_1}{\partial y_1} & \dots &\frac{\partial x_n}{\partial y_1}\\ \vdots &\ddots & \vdots \\ \frac{\partial x_1}{\partial y_m} & \dots &\frac{\partial x_m}{\partial y_m}
     \end{bmatrix}$
-13. In the case where $x,y \in \mathbb{R}^n$, then $\frac{d x^Ty}{d y}=x$
-14. In the case where $x\in \mathbb{R}^n$ and $A \in \mathbb{R}^{n \times n}$, then $\frac{d x^TAx}{d x}=(A+A^T)x$
+14. In the case where $x,y \in \mathbb{R}^n$, then $\frac{d x^Ty}{d y}=x$
+15. In the case where $x\in \mathbb{R}^n$ and $A \in \mathbb{R}^{n \times n}$, then $\frac{d x^TAx}{d x}=(A+A^T)x$
 
 ### Handy R Code
 
@@ -105,3 +107,13 @@ All told, our model is $\begin{bmatrix}y_1\\ \vdots \\y_n \end{bmatrix}=\begin{b
 # Week 2
 
 Our model is $y=X\beta+\epsilon$. Our goal is to choose $\beta$ such that $\|\epsilon\|^2=\|y-X\beta\|^2$ is minimized. Expanding the inner product, we have $(y-X\beta)^T(y-X\beta)=y^Ty-2y^TX\beta+\beta^TX^TX\beta$. Since $y$ is determined, it suffices to minimize $f(\beta)=\beta^TX^TX\beta-2y^TX\beta$. From matrix review steps 11-14, we have $\frac{d f}{d \beta}=2X^TX \beta-2X^Ty$, and so the equation is minimized when $X^TX\beta=X^Ty$. This is called the **normal equation** (normal because the columns of $X$ are normal to $y-X\beta)$. When $X$ is invertible, this implies that our **ordinary least squares solution** is $\hat{\beta}=(X^TX)^{-1}X^T y$.
+
+Note that our model $y=X\beta+\epsilon$ can be written $y=v+\epsilon$ where $v \in C(X)$ (that is what it means to be in the column space). Thus we are choosing the $v \in C(X)$ that is closest to $y$. Of course, this is the orthogonal projection of $y$ onto $C(X)$. From step 9, our estimate for $v$ is then $P_Xy=X(X^TX)^{-1}y$ and so we have $X\hat{\beta}=X(X^TX)^{-1}y$. Multiplying both sides on the left by $X^T$, we get back our normal equation, $X^TX\beta=X^Ty$, and (when $X$ is invertible), find our predicted values of our response to be $\hat{y}=X\hat{\beta}=X(X^TX)^{-1}X^T y=P_Xy$. The residuals of our model are the observed values $y$ less the predicted values $\hat{y}=X\hat{\beta}$; $\hat{e}=y-P_Xy=(I-P_X)y$.
+
+Does our ordinaly least squares solution (OLS) $\hat{\beta}$ have any nice properties in a Gauss-Markov model? For one, it is unbiased: $\mathbb{E}(\hat{\beta})=\beta$. See that $\mathbb{E}(\hat{\beta})=\mathbb{E}\left((X^TX)^{-1}X^Ty\right)=(X^TX)^{-1}X^T\mathbb{E}(y)$, and then by the Gauss-Markov assumption that $\mathbb{E}(\epsilon)=0$, we can continue $(X^TX)^{-1}X^T\left(\mathbb{E}(X\beta)+\mathbb{E}(\epsilon)\right)=(X^TX)^{-1}X^TX\beta=\beta$. Using our 5th fact from the matrix review, we further know that $\text{Cov}(\hat{\beta})=\text{Cov}((X^TX)^{-1}X^Ty)=\left[(X^TX)^{-1}X^T\right]\text{Cov}(y)\left[(X^TX)^{-1}X^T\right]^T$, and by the Gauss-Markov assumption that $\text{Cov}(\epsilon)=\sigma^2I$, we can continue (after pulling out the scalar $\sigma^2$) as $\sigma^2\left[(X^TX)^{-1}X^T\right]\left[(X^TX)^{-1}X^T\right]^T=\sigma^2\left[(X^TX)^{-1}X^T\right]\left[X((X^TX)^T)^{-1}\right]=\sigma^2\left[(X^TX)^{-1}X^T\right]\left[X(X^TX)^{-1}\right]$ (from matrix review 3b and 3e). Simplifying terms, we see that $\text{Cov}(\hat{\beta})=\sigma^2(X^TX)^{-1}$.
+
+See slides 16-19 for why $\text{Cov}(\hat{\epsilon})=\sigma^2(I-P_X)=\mathbb{E}(\hat{\epsilon}\hat{\epsilon}^T)=\sigma^2(n-rank(X))$, thus $\frac{\hat{\epsilon}^T\hat{\epsilon}}{n-\text{rank}(X)}$ is an unbiased estimator of $\sigma^2$. The **sum Of square errors (SSE)**, also called **residual sum of squares (RSS)**, is the inner product of $\hat{\epsilon}$ with itself, $SSE=\hat{\epsilon}^T\hat{\epsilon}$. So our unbiased estimate for $\sigma^2$ is $\hat{\sigma^2}=\frac{SSE}{n-\text{rank}(X)}$.
+
+In the general case, we may not have invertible $X$. In such cases, the normal equation is still $X^TX\beta=X^Ty$, but we now use a **generalized inverse (g-inverse)** to come up with our estimate. A matrix $G$ is called a g-inverse of a matrix $A$ if and only if $AGA=A$, and every matrix $A$ has a (non-unique) g-inverse. So while our predicted response for models where $X$ is not invertible is $\hat{y}=X\hat{\beta}$ where $\hat{\beta}=(X^TX)^-X^Ty$, even though $(X^TX)^-$ is not unique, $X(X^TX)^-X^T$ is (no matter the choice of $\hat{\beta}$, $\hat{y}$ is unique). The residuals and estimator of $\sigma^2$ are also unique.
+
+
