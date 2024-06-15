@@ -241,4 +241,21 @@ compare_r2
 ```
 
 
+### Addional Assumption to Gauss-Markov
+
+Thus far we have assumed our model $y=X\beta+\epsilon$ is such that $\mathbb{E}(\epsilon)=0$ and $\mathbb{V}(\epsilon)=\sigma^2I$. From now, on, we'd like to make an additional assumption on the *distribution* of the errors, namely that $\epsilon \in \mathbb{R}^n$ follows a multivariate normal distribution with mean $0 \in \mathbb{R}^n$ and Covariance matrix $\sigma^2I$ (i.e. $\text{Cov}(\epsilon_i, \epsilon_j)=0$ when $i \neq j$). In such a model, by the rules of expectation and variance, $y \sim N(X\beta, \sigma^2I)$. This means that each individual $y_i$ is normal with mean $X\beta_i$ and variance $\sigma^2$. Using previous results for our least-squares solution in the Gauss-Markov model, if $X$ has full column rank, then under this additional assumption, $\hat{\beta} \sim N(\beta, \sigma^2(X^TX)^{-1})$.
+
+XXXXXX WHEN get more time, show with "Week 3- Testing in R" that this is indeed the case (centered at true, variance whatever)XXXXXXXXXXX
+
+
+### Hypothesis testing for single coefficient (t-test)
+
+Our model is $y_i=\beta_0+X\beta_1+\epsilon_i$ where $\epsilon_i \stackrel{iid}{\sim}N(0, \sigma^2)$. We want to test the hypothesis $H_0: \beta_1=0$ against the alternative $H_a: \beta_1 \neq 0$. We know that $\hat{\beta_1} \sim N(\beta_1, \sigma^2(X^TX)^{-1}_{2_2})$. If we standardize $\hat{\beta_1}$ by subtracting the mean and dividing by the standard deviation, we know that $\frac{\hat{\beta_1}-\beta_1}{\text{SE}(\hat{\beta_1})}=\frac{\hat{\beta_1}-\beta_1}{\sqrt{\sigma^2(X^TX)^{-1}_{2_2}}} \sim N(0,1)$. Unfortunately, this is not easily used since $\sigma^2$ is unknown. Instead, we must estimate it with $\hat{\sigma^2}$. 
+
+Our statistic of interest then becomes $\frac{\hat{\beta_1}-\beta_1}{\sqrt{\hat{\sigma^2}(X^TX)^{-1}_{2_2}}}$, and we want to see how this behaves under the assumption that $\beta_1=0$. This is called our test-statistic, $t=\frac{\hat{\beta_1}}{\hat{\text{SE}}(\hat{\beta_1})}$. If our null hypothesis that $\beta_1=0$ is really true, then $t$ follows a t-distribution with $n-\text{rank}(X)$ degrees of freedom; $t \sim t_{n-\text{rank}(X)}$. As would be expected, we reject our null hypothesis in favor of the alternative if $|t|$ is greater than our critical value (where $\alpha$ is our significance level, we reject $H_0$ when $|t| > t_{\frac{\alpha}{2}, n-\text{rank}(X)}$). Equivalently, we reject when our p-value (the probability of observing data as or more extreme under the null hypothesis) is less than our significance level.
+
+
+### Hypothesis testing for multiple parameters (F-test)
+
+
 
