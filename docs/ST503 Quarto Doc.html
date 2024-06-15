@@ -164,7 +164,7 @@ window.Quarto = {
 
 <section id="week-1" class="level1">
 <h1>Week 1</h1>
-<p>Our goal is to predict a response variable, call it <span class="math inline">\(y\)</span> (for example, the average velocity of a pitcher). To do so, we have predictive variables <span class="math inline">\(x_1, x_2, \dots\)</span> (for example, the height of the player, the weight of a player, etc.). To find the relationship between the response and predictors, we ideally have many different observations (many different players we observe). Loosely speaking, our goal in creating linear models is to find the coefficients <span class="math inline">\(\beta_i\)</span> to the predictors <span class="math inline">\(x_i\)</span> such that the error terms <span class="math inline">\(\epsilon_i\)</span> in the equation <span class="math inline">\(y_i=\beta_0+\beta_1f(x_1)+\beta_2g(x_2)+\dots+\epsilon_i\)</span> are minimized. The term ‘linear’ in ‘linear models’ refers to the fact that the aforementioned equation is linear <em>in the</em> <span class="math inline">\(\beta_i\)</span>. When writing out each of our observations, we see that the system of equations can be written compactly in the matrix form <span class="math inline">\(y=X\beta+\epsilon\)</span>.</p>
+<p>Our goal is to predict a response variable, call it <span class="math inline">\(y\)</span> (for example, the average velocity of a pitcher). To do so, we have predictive (covariate) variables <span class="math inline">\(x_1, x_2, \dots\)</span> (for example, the height of the player, the weight of a player, etc.). To find the relationship between the response and predictors, we ideally have many different observations (many different players we observe). Loosely speaking, our goal in creating linear models is to find the coefficients <span class="math inline">\(\beta_i\)</span> to the predictors <span class="math inline">\(x_i\)</span> such that the error terms <span class="math inline">\(\epsilon_i\)</span> in the equation <span class="math inline">\(y_i=\beta_0+\beta_1f(x_1)+\beta_2g(x_2)+\dots+\epsilon_i\)</span> are minimized. The term ‘linear’ in ‘linear models’ refers to the fact that the aforementioned equation is linear <em>in the</em> <span class="math inline">\(\beta_i\)</span>. When writing out each of our observations, we see that the system of equations can be written compactly in the matrix form <span class="math inline">\(y=X\beta+\epsilon\)</span>.</p>
 <section id="matrix-review" class="level3">
 <h3 class="anchored" data-anchor-id="matrix-review">Matrix Review</h3>
 <ol type="1">
@@ -178,16 +178,25 @@ window.Quarto = {
 <li><span class="math inline">\((AB)^T=B^TA^T\)</span></li>
 <li><span class="math inline">\((xA)^T=xA^T\)</span></li>
 <li><span class="math inline">\((Ax)^T=x^TA^T\)</span></li>
+<li>$(A<sup>{-1})</sup>T=(A<sup>T)</sup>{-1}</li>
 </ol>
 <!-- -->
 <ol start="4" type="1">
 <li>If a matrix <span class="math inline">\(A\)</span> in invertible, then <span class="math inline">\(A^TA\)</span> is also invertible. Thus when solving the system <span class="math inline">\(Ax=b\)</span> for full-rank <span class="math inline">\(A\)</span>, we know <span class="math inline">\(x=A^{-1}b=(A^TA)^{-1}A^Tb\)</span></li>
-<li><span class="math inline">\(\text{Cov}(Ay)=A \text{Cov}(y)A^T\)</span></li>
+<li><span class="math inline">\(\text{Cov}(Ay)=A \text{Cov}(y)A^T\)</span> and <span class="math inline">\(\mathbb{V}(A^Ty)=A^T \text{Cov}(y)A\)</span>.</li>
 <li><span class="math inline">\(\text{Cov}(X,Y)=\mathbb{E}(XY)-\mathbb{E}(X)\mathbb{E}(Y)\)</span>. Since <span class="math inline">\(\mathbb{V}(X)=\mathbb{E}(X^2)-\mathbb{E}(X)^2\)</span>, <span class="math inline">\(\mathbb{V}(X)=\text{Cov}(X,X)\)</span>. If random variables are independent, then covariance is zero.</li>
 <li>The covariance matrix of a vector <span class="math inline">\(\epsilon\)</span> is as expected: <span class="math inline">\(\text{Cov}(\epsilon)=\begin{bmatrix}
 \mathbb{V}(\epsilon_1) &amp; \text{Cov}(\epsilon_1, \epsilon_2) &amp; \dots &amp;  \text{Cov}(\epsilon_1, \epsilon_n)\\ &amp;\mathbb{V}(\epsilon_2) &amp; \dots &amp;\text{Cov}(\epsilon_2, \epsilon_n) \\
 \\ &amp; &amp; \ddots &amp;\vdots \\ &amp; &amp; &amp; \mathbb{V}(\epsilon_n) \end{bmatrix}\)</span></li>
 <li>The correlation <span class="math inline">\(\rho\)</span> between variables <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> is <span class="math inline">\(\frac{\text{Cov}(X,Y)}{\sqrt{\mathbb{V}(X)\mathbb{V}(Y)}}\)</span></li>
+<li>The projection of a vector <span class="math inline">\(y\)</span> onto the column space of <span class="math inline">\(A\)</span> is <span class="math inline">\(y^*=P_Ay\)</span> where <span class="math inline">\(P_A\)</span> is the projection matrix <span class="math inline">\(A(A^TA)^{-1}A^T\)</span>.</li>
+<li>Projection matrices are symmetric (<span class="math inline">\(P_A=P_A^T\)</span>) and idempotent (<span class="math inline">\(P_X^2=P_X\)</span>).</li>
+<li>The norm of a vector <span class="math inline">\(x\)</span> is <span class="math inline">\(\|x\|=\langle x, x \rangle=(x_1^2+\dots+x_n^2)^{\frac{1}{2}}\)</span>.</li>
+<li>Differentiating a scalar <span class="math inline">\(v\)</span> with respect to a vector <span class="math inline">\(x\)</span> returns a vector whose components are the partial derivatives with respect to each component of <span class="math inline">\(x\)</span>, <span class="math inline">\(\frac{d v}{dx}=\begin{bmatrix} \frac{\partial v}{\partial x_1} &amp;\dots &amp; \frac{\partial v}{\partial x_n}\end{bmatrix}^T\)</span>. This is called the <strong>gradient</strong></li>
+<li>Differentiating a vector <span class="math inline">\(x\in \mathbb{R}^n\)</span> with respect to another vector <span class="math inline">\(y \in \mathbb{R}^m\)</span> returns an <span class="math inline">\(m \times n\)</span> matrix of partials called the <strong>Jacobian Matrix</strong>, <span class="math inline">\(\frac{d x}{dy}=\begin{bmatrix} \frac{\partial x_1}{\partial y_1} &amp; \dots &amp;\frac{\partial x_n}{\partial y_1}\\ \vdots &amp;\ddots &amp; \vdots \\ \frac{\partial x_1}{\partial y_m} &amp; \dots &amp;\frac{\partial x_m}{\partial y_m}
+\end{bmatrix}\)</span></li>
+<li>In the case where <span class="math inline">\(x,y \in \mathbb{R}^n\)</span>, then <span class="math inline">\(\frac{d x^Ty}{d y}=x\)</span></li>
+<li>In the case where <span class="math inline">\(x\in \mathbb{R}^n\)</span> and <span class="math inline">\(A \in \mathbb{R}^{n \times n}\)</span>, then <span class="math inline">\(\frac{d x^TAx}{d x}=(A+A^T)x\)</span></li>
 </ol>
 </section>
 <section id="handy-r-code" class="level3">
@@ -270,7 +279,7 @@ attr(,"class")
 <li>Least-squares: <span class="math inline">\(y=X\beta+\epsilon\)</span></li>
 <li>Gauss-Markov: <span class="math inline">\(y=X\beta+\epsilon\)</span> where <span class="math inline">\(\mathbb{E}(\epsilon)=0\)</span> and <span class="math inline">\(\text{Cov}(\epsilon)=\sigma^2 I\)</span> (i.e.&nbsp;there is no covariance between epsilon terms).</li>
 <li>Aitken Model: <span class="math inline">\(y=X\beta+\epsilon\)</span> where <span class="math inline">\(\mathbb{E}(\epsilon)=0\)</span> and <span class="math inline">\(\text{Cov}(\epsilon)=\sigma^2 V\)</span> for some known positive definite matrix <span class="math inline">\(V\)</span></li>
-<li>One-Way ANOVA. Interested in if <span class="math inline">\(\mu_1=\mu_2\)</span>. We can write <span class="math inline">\(\mu_i=\mu+(\mu_i-\mu)=\mu+\alpha_i\)</span>. Then <span class="math inline">\(\begin{bmatrix}y_{1_1} \\ \vdots \\ y_{1_{n}} \\ y_{2_1} \\ \vdots \\ y_{2_n}\end{bmatrix}=\begin{bmatrix} 1 &amp; 0 \\ \vdots &amp;\vdots \\ 1 &amp; 0 \\ 0 &amp; 1 \\ \vdots &amp; \vdots \\ 0 &amp; 1 \end{bmatrix} \begin{bmatrix} \mu_1 \\ \mu_2\end{bmatrix}+\begin{bmatrix} \epsilon_{1_1} \\ \vdots \\ \epsilon_{1_{n}} \\ \epsilon_{2_1} \\ \vdots \\ \epsilon_{2_n}\end{bmatrix}\)</span></li>
+<li>One-Way ANOVA. Interested in if <span class="math inline">\(\mu_1=\mu_2\)</span>. We can write <span class="math inline">\(\mu_i=\mu+(\mu_i-\mu)=\mu+\alpha_i\)</span>. Then <span class="math inline">\(\begin{bmatrix}y_{1_1} \\ \vdots \\ y_{1_{n}} \\ y_{2_1} \\ \vdots \\ y_{2_n}\end{bmatrix}=\begin{bmatrix} 1 &amp; 0 \\ \vdots &amp;\vdots \\ 1 &amp; 0 \\ 1 &amp; 1 \\ \vdots &amp; \vdots \\ 1 &amp; 1 \end{bmatrix} \begin{bmatrix} \mu \\ \alpha_1\end{bmatrix}+\begin{bmatrix} \epsilon_{1_1} \\ \vdots \\ \epsilon_{1_{n}} \\ \epsilon_{2_1} \\ \vdots \\ \epsilon_{2_n}\end{bmatrix}\)</span></li>
 </ol>
 </section>
 <section id="example" class="level3">
@@ -332,9 +341,206 @@ F-statistic: 28.41 on 1 and 45 DF,  p-value: 3.045e-06</code></pre>
 </div>
 <p>In such a simple model, we can just read off the estimates for <span class="math inline">\(\beta_0\)</span> (the intercept) and <span class="math inline">\(\beta_1\)</span> the coefficient for weekly income. We can also access them directly with the following:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>gambling_coef<span class="ot">=</span>gamble_regression<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>gambling_coef<span class="ot">=</span>gamble_regression<span class="sc">$</span>coefficients</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>gambling_coef</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept)      income 
+  -6.324559    5.520485 </code></pre>
+</div>
 </div>
 <p>All told, our model is <span class="math inline">\(\begin{bmatrix}y_1\\ \vdots \\y_n \end{bmatrix}=\begin{bmatrix}1 &amp; x_1\\ \vdots &amp;\vdots\\1&amp;x_n \end{bmatrix} \begin{bmatrix} -6.352\\5.52\end{bmatrix}+\begin{bmatrix}\epsilon_1\\ \vdots\\ \epsilon_n \end{bmatrix}\)</span></p>
+</section>
+</section>
+<section id="week-2" class="level1">
+<h1>Week 2</h1>
+<p>Our model is <span class="math inline">\(y=X\beta+\epsilon\)</span>. Our goal is to choose <span class="math inline">\(\beta\)</span> such that <span class="math inline">\(\|\epsilon\|^2=\|y-X\beta\|^2\)</span> is minimized. Expanding the inner product, we have <span class="math inline">\((y-X\beta)^T(y-X\beta)=y^Ty-2y^TX\beta+\beta^TX^TX\beta\)</span>. Since <span class="math inline">\(y\)</span> is determined, it suffices to minimize <span class="math inline">\(f(\beta)=\beta^TX^TX\beta-2y^TX\beta\)</span>. From matrix review steps 11-14, we have <span class="math inline">\(\frac{d f}{d \beta}=2X^TX \beta-2X^Ty\)</span>, and so the equation is minimized when <span class="math inline">\(X^TX\beta=X^Ty\)</span>. This is called the <strong>normal equation</strong> (normal because the columns of <span class="math inline">\(X\)</span> are normal to <span class="math inline">\(y-X\beta)\)</span>. When <span class="math inline">\(X\)</span> is invertible, this implies that our <strong>ordinary least squares solution</strong> is <span class="math inline">\(\hat{\beta}=(X^TX)^{-1}X^T y\)</span>.</p>
+<p>Note that our model <span class="math inline">\(y=X\beta+\epsilon\)</span> can be written <span class="math inline">\(y=v+\epsilon\)</span> where <span class="math inline">\(v \in C(X)\)</span> (that is what it means to be in the column space). Thus we are choosing the <span class="math inline">\(v \in C(X)\)</span> that is closest to <span class="math inline">\(y\)</span>. Of course, this is the orthogonal projection of <span class="math inline">\(y\)</span> onto <span class="math inline">\(C(X)\)</span>. From step 9, our estimate for <span class="math inline">\(v\)</span> is then <span class="math inline">\(P_Xy=X(X^TX)^{-1}y\)</span> and so we have <span class="math inline">\(X\hat{\beta}=X(X^TX)^{-1}y\)</span>. Multiplying both sides on the left by <span class="math inline">\(X^T\)</span>, we get back our normal equation, <span class="math inline">\(X^TX\beta=X^Ty\)</span>, and (when <span class="math inline">\(X\)</span> is invertible), find our predicted values of our response to be <span class="math inline">\(\hat{y}=X\hat{\beta}=X(X^TX)^{-1}X^T y=P_Xy\)</span>. The residuals of our model are the observed values <span class="math inline">\(y\)</span> less the predicted values <span class="math inline">\(\hat{y}=X\hat{\beta}\)</span>; <span class="math inline">\(\hat{e}=y-P_Xy=(I-P_X)y\)</span>.</p>
+<p>Does our ordinaly least squares solution (OLS) <span class="math inline">\(\hat{\beta}\)</span> have any nice properties in a Gauss-Markov model? For one, it is unbiased: <span class="math inline">\(\mathbb{E}(\hat{\beta})=\beta\)</span>. See that <span class="math inline">\(\mathbb{E}(\hat{\beta})=\mathbb{E}\left((X^TX)^{-1}X^Ty\right)=(X^TX)^{-1}X^T\mathbb{E}(y)\)</span>, and then by the Gauss-Markov assumption that <span class="math inline">\(\mathbb{E}(\epsilon)=0\)</span>, we can continue <span class="math inline">\((X^TX)^{-1}X^T\left(\mathbb{E}(X\beta)+\mathbb{E}(\epsilon)\right)=(X^TX)^{-1}X^TX\beta=\beta\)</span>. Using our 5th fact from the matrix review, we further know that <span class="math inline">\(\text{Cov}(\hat{\beta})=\text{Cov}((X^TX)^{-1}X^Ty)=\left[(X^TX)^{-1}X^T\right]\text{Cov}(y)\left[(X^TX)^{-1}X^T\right]^T\)</span>, and by the Gauss-Markov assumption that <span class="math inline">\(\text{Cov}(\epsilon)=\sigma^2I\)</span>, we can continue (after pulling out the scalar <span class="math inline">\(\sigma^2\)</span>) as <span class="math inline">\(\sigma^2\left[(X^TX)^{-1}X^T\right]\left[(X^TX)^{-1}X^T\right]^T=\sigma^2\left[(X^TX)^{-1}X^T\right]\left[X((X^TX)^T)^{-1}\right]=\sigma^2\left[(X^TX)^{-1}X^T\right]\left[X(X^TX)^{-1}\right]\)</span> (from matrix review 3b and 3e). Simplifying terms, we see that <span class="math inline">\(\text{Cov}(\hat{\beta})=\sigma^2(X^TX)^{-1}\)</span>.</p>
+<p>See slides 16-19 for why <span class="math inline">\(\text{Cov}(\hat{\epsilon})=\sigma^2(I-P_X)=\mathbb{E}(\hat{\epsilon}\hat{\epsilon}^T)=\sigma^2(n-rank(X))\)</span>, thus <span class="math inline">\(\frac{\hat{\epsilon}^T\hat{\epsilon}}{n-\text{rank}(X)}\)</span> is an unbiased estimator of <span class="math inline">\(\sigma^2\)</span>. The <strong>sum Of square errors (SSE)</strong>, also called <strong>residual sum of squares (RSS)</strong>, is the inner product of <span class="math inline">\(\hat{\epsilon}\)</span> with itself, <span class="math inline">\(SSE=\hat{\epsilon}^T\hat{\epsilon}\)</span>. So our unbiased estimate for <span class="math inline">\(\sigma^2\)</span> is <span class="math inline">\(\hat{\sigma^2}=\frac{SSE}{n-\text{rank}(X)}\)</span>.</p>
+<p>In the general case, we may not have invertible <span class="math inline">\(X\)</span>. In such cases, the normal equation is still <span class="math inline">\(X^TX\beta=X^Ty\)</span>, but we now use a <strong>generalized inverse (g-inverse)</strong> to come up with our estimate. A matrix <span class="math inline">\(G\)</span> is called a g-inverse of a matrix <span class="math inline">\(A\)</span> if and only if <span class="math inline">\(AGA=A\)</span>, and every matrix <span class="math inline">\(A\)</span> has a (non-unique) g-inverse. So while our predicted response for models where <span class="math inline">\(X\)</span> is not invertible is <span class="math inline">\(\hat{y}=X\hat{\beta}\)</span> where <span class="math inline">\(\hat{\beta}=(X^TX)^-X^Ty\)</span>, even though <span class="math inline">\((X^TX)^-\)</span> is not unique, <span class="math inline">\(X(X^TX)^-X^T\)</span> is (no matter the choice of <span class="math inline">\(\hat{\beta}\)</span>, <span class="math inline">\(\hat{y}\)</span> is unique). The residuals and estimator of <span class="math inline">\(\sigma^2\)</span> are also unique.</p>
+<section id="comparing-r-estimates-to-derived-estimates" class="level3">
+<h3 class="anchored" data-anchor-id="comparing-r-estimates-to-derived-estimates">Comparing R Estimates To Derived Estimates</h3>
+<p>Our ordinary least-squares solution for a Gauss-Markov model was shown to be <span class="math inline">\(\hat{\beta}=(X^TX)^{-1}X^T y\)</span>. Let’s verify that the regression coefficients we get from R match these values.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(faraway)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>gamble_regression<span class="ot">=</span><span class="fu">lm</span>(gamble <span class="sc">~</span> ., <span class="at">data=</span>teengamb) <span class="co">#all variables predictors#</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>X<span class="ot">=</span><span class="fu">model.matrix</span>(gamble<span class="sc">~</span>., <span class="at">data=</span>teengamb) </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>y<span class="ot">=</span>teengamb<span class="sc">$</span>gamble</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>bhat<span class="ot">=</span><span class="fu">solve</span>(<span class="fu">t</span>(X) <span class="sc">%*%</span> X) <span class="sc">%*%</span> <span class="fu">t</span>(X) <span class="sc">%*%</span>y</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>compare_coef<span class="ot">=</span><span class="fu">data.frame</span>(<span class="at">direct=</span>bhat, <span class="at">lm=</span>gamble_regression<span class="sc">$</span>coefficients)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>compare_coef</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                  direct           lm
+(Intercept)  22.55565063  22.55565063
+sex         -22.11833009 -22.11833009
+status        0.05223384   0.05223384
+income        4.96197922   4.96197922
+verbal       -2.95949350  -2.95949350</code></pre>
+</div>
+</div>
+<p>Great, now that we’ve shown that our estimate <span class="math inline">\(\hat{\beta}\)</span> matches up, we may be interested in the standard error of our estimate. We first need to compute our estimate of <span class="math inline">\(\hat{sigma^2}\)</span>, which we showed earlier was <span class="math inline">\(\frac{\hat{\epsilon}^T\hat{\epsilon}}{n-\text{rank}(X)}\)</span>. We verify our calculations match with the following.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>res<span class="ot">=</span>gamble_regression<span class="sc">$</span>residual <span class="co">#observed less predicted#</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>SSE<span class="ot">=</span><span class="fu">sum</span>(res<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>n<span class="ot">=</span><span class="fu">nrow</span>(X)                      <span class="co">#X is the model matrix defined above#</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>r<span class="ot">=</span><span class="fu">qr</span>(X)<span class="sc">$</span>rank</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>sigmasqrhat<span class="ot">=</span>SSE<span class="sc">/</span>(n<span class="sc">-</span>r)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>sigmahat<span class="ot">=</span><span class="fu">sqrt</span>(sigmasqrhat)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>compare_sigma<span class="ot">=</span><span class="fu">data.frame</span>(<span class="at">direct=</span>sigmahat, <span class="at">lm=</span><span class="fu">summary</span>(gamble_regression)<span class="sc">$</span>sigma)</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>compare_sigma</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    direct       lm
+1 22.69034 22.69034</code></pre>
+</div>
+</div>
+<p>With our estimate <span class="math inline">\(\hat{\sigma^2}\)</span> in hand, we can compute the standard error of our estimates of the regression coefficients. We have previously derived that <span class="math inline">\(\text{Cov}(\hat{\beta})=\hat{\sigma^2}(X^TX)^{-1}\)</span>. The standard error of any element of <span class="math inline">\(\hat{\beta}\)</span> is found from the diagonal element of the covariance matrix (square root since the diagonal of the covariance matrix are the variances); <span class="math inline">\(\text{SE}(\beta_i)=\hat{\sigma}\sqrt{(X^TX)^{-1}_{i,i}}\)</span>. We finally verify these match R with the following:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>sigmahat                                      <span class="co">#from above code chunk#</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 22.69034</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>beta_se<span class="ot">=</span>sigmahat<span class="sc">*</span><span class="fu">sqrt</span>(<span class="fu">diag</span>(<span class="fu">solve</span>(<span class="fu">t</span>(X)<span class="sc">%*%</span>X)))  <span class="co">#X from previous code chunk#</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>compare_se<span class="ot">=</span><span class="fu">data.frame</span>(<span class="at">direct=</span>beta_se, </span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">lm=</span><span class="fu">summary</span>(gamble_regression)<span class="sc">$</span>coef[, <span class="st">"Std. Error"</span>])</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>compare_se</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                direct         lm
+(Intercept) 17.1968034 17.1968034
+sex          8.2111145  8.2111145
+status       0.2811115  0.2811115
+income       1.0253923  1.0253923
+verbal       2.1721503  2.1721503</code></pre>
+</div>
+</div>
+<p>Note that while we could grab our regression coefficients <span class="math inline">\(\hat{\beta}\)</span> with <code>gamble_regression$coefficients</code>, our residual standard error with <code>summary(gamble_regression)$sigma</code>, and our standard errors with <code>summary(gamble_regression)$coef[, "Std. Error"]</code>, we can also read these directly off the summary from the first column, third to last row, and second column respectively.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(gamble_regression)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = gamble ~ ., data = teengamb)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-51.082 -11.320  -1.451   9.452  94.252 
+
+Coefficients:
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  22.55565   17.19680   1.312   0.1968    
+sex         -22.11833    8.21111  -2.694   0.0101 *  
+status        0.05223    0.28111   0.186   0.8535    
+income        4.96198    1.02539   4.839 1.79e-05 ***
+verbal       -2.95949    2.17215  -1.362   0.1803    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 22.69 on 42 degrees of freedom
+Multiple R-squared:  0.5267,    Adjusted R-squared:  0.4816 
+F-statistic: 11.69 on 4 and 42 DF,  p-value: 1.815e-06</code></pre>
+</div>
+</div>
+</section>
+<section id="estimability" class="level3">
+<h3 class="anchored" data-anchor-id="estimability">Estimability</h3>
+<p>What values can be estimated with an unbiased estimator in a Gauss-Markov model? In essence, we are asking which <strong>linera functions</strong> of <span class="math inline">\(\beta\)</span>, call them <span class="math inline">\(c^T\beta\)</span> for some vector <span class="math inline">\(c\)</span>, are estimable. A <strong>linear estimator</strong> has the form <span class="math inline">\(l^Ty\)</span> for some vector <span class="math inline">\(l\)</span>. Then the function <span class="math inline">\(c^T\beta\)</span> is <strong>estimable</strong> if and only if there is a linear estimator <span class="math inline">\(l^Ty\)</span> such that <span class="math inline">\(\mathbb{E}(l^Ty)=c^T\beta\)</span> for all <span class="math inline">\(\beta\)</span>. Such estimators <span class="math inline">\(l^Ty\)</span> are called a <strong>linear unbiased estimator (LUE)</strong> of <span class="math inline">\(c^T\beta\)</span>.</p>
+<p>Suppose <span class="math inline">\(c^T\beta\)</span> is estimable. Then <span class="math inline">\(\mathbb{E}(l^Ty)=c^T\beta \implies l^TX\beta=c^T\beta \implies l^TX=c^T\)</span>. In other words, <span class="math inline">\(c^T\beta\)</span> is estimable if and only if <span class="math inline">\(c\)</span> is in the column space of <span class="math inline">\(X^T\)</span> (the row space of <span class="math inline">\(X\)</span>). Since the left null space is orthogonal to the row space, <span class="math inline">\(c^T\beta\)</span> is also estimable if and only if <span class="math inline">\(C\)</span> is orthogonal to the left null space.</p>
+<p>For an example, recall our ANOVA model: <span class="math inline">\(\begin{bmatrix}y_{1_1} \\ \vdots \\ y_{1_{n}} \\ y_{2_1} \\ \vdots \\ y_{2_n} \\ y_{3_1} \\ \vdots \\ y_{3_n}\end{bmatrix}=\begin{bmatrix} 1 &amp; 1 &amp;0  \\ \vdots &amp;\vdots &amp;\vdots \\ 1 &amp; 1 &amp;0 \\ 1 &amp; 0&amp;1 \\ \vdots &amp; \vdots &amp;\vdots \\ 1 &amp; 0 &amp;1\end{bmatrix} \begin{bmatrix} \mu \\ \alpha_1 \\ \alpha_2\end{bmatrix}+\begin{bmatrix} \epsilon_{1_1} \\ \vdots \\ \epsilon_{1_{n}} \\ \epsilon_{2_1} \\ \vdots \\ \epsilon_{2_n} \\ \epsilon_{3_1} \\ \vdots \\ \epsilon_{3_n}\end{bmatrix}\)</span>. Note that <span class="math inline">\(\mu+\alpha_1=\begin{bmatrix} 1&amp;1&amp;0\end{bmatrix}\begin{bmatrix} \mu \\ \alpha_1 \\ \alpha_2\end{bmatrix}=c^T\beta\)</span> is estimable, since <span class="math inline">\(c\)</span> is in the row space of <span class="math inline">\(X\)</span> (it is the very first row). On the other hand, <span class="math inline">\(\mu=\begin{bmatrix} 1&amp;0&amp;0\end{bmatrix}\begin{bmatrix} \mu \\ \alpha_1 \\ \alpha_2\end{bmatrix}\)</span> is not estimable, since the row space of <span class="math inline">\(X\)</span> is <span class="math inline">\(\text{span}\left\{\begin{pmatrix}1\\1\\0\end{pmatrix}^T, \begin{pmatrix}0\\0\\1\end{pmatrix}^T\right\}\)</span>.</p>
+<p>If <span class="math inline">\(c^T\beta\)</span> is estimable, then <span class="math inline">\(c^T\hat{\beta}\)</span> is a LUE. linear since <span class="math inline">\(c^T\hat{\beta}=c^T(C^TC)^-C^Ty=l^Ty\)</span>. Unbiased since <span class="math inline">\(\mathbb{E}(c^T\hat{\beta})=\mathbb{E}(l^TX\hat{\beta})=\mathbb{E}(l^T\hat{y})=l^T\mathbb{E}(\hat{y})=l^TX\beta=c^T\beta\)</span>. Look at pages 6 and 7 on week 3 A to see <span class="math inline">\(\mathbb{V}(c^T\beta)=c^T\sigma^2(X^TX)^-c\)</span>.</p>
+</section>
+<section id="checking-estimability-with-r" class="level3">
+<h3 class="anchored" data-anchor-id="checking-estimability-with-r">Checking estimability with R</h3>
+<p>There is a package <code>estimability</code> in R that helps determine the estimability of linear function of <span class="math inline">\(\beta\)</span>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(estimability)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>X<span class="ot">=</span><span class="fu">cbind</span>(<span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">5</span>), <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">5</span><span class="sc">:</span><span class="dv">1</span>, <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>cvec1<span class="ot">=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">2</span>,<span class="dv">5</span>)        <span class="co">#so, c^T\beta=1\beta_0+4\beta_1+...#</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>nb<span class="ot">=</span><span class="fu">nonest.basis</span>(X)     <span class="co">#some basis vectors of left null space#</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="fu">is.estble</span>(cvec1, nb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>cvec2<span class="ot">=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">1</span>)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">is.estble</span>(cvec2, nb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+</div>
+<p>The key here is the <code>is.estble</code> function, which requires we come up with the left null space via the <code>nonest.basis</code> function. We can see that the basis generated by this function is indeed a basis for the left null space by direct computation (that the values aren’t exactly zero is a storage/rounding error)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>nb</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            [,1]       [,2]
+[1,]  0.25533081  0.9492620
+[2,]  0.71407655 -0.2512536
+[3,]  0.06553511 -0.1715022
+[4,] -0.64854145  0.0797514</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(X)[,<span class="dv">1</span>] <span class="sc">%*%</span> nb  <span class="co">#zero with computer rounding#</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             [,1]          [,2]
+[1,] 1.554312e-15 -6.106227e-16</code></pre>
+</div>
+</div>
+<p>Likewise we see that the first linear function we tested, <span class="math inline">\(c^T\beta=\beta_0+4\beta_1+2\beta_2+5\beta_3\)</span>, is indeed estimable, since it is orthogonal to the left null space of our model matrix <span class="math inline">\(X\)</span>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(cvec1) <span class="sc">%*%</span> nb   <span class="co">#zero with computer rounding#</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             [,1]          [,2]
+[1,] 1.776357e-15 -3.330669e-16</code></pre>
+</div>
+</div>
+<p>On the otherhand, the second linear function we tested, <span class="math inline">\(\beta_0+2\beta_1+2\beta_2+\beta_3\)</span> is not estimable, since it isn’t orthogonal to the left null space of <span class="math inline">\(X\)</span>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(cvec2) <span class="sc">%*%</span> nb</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         [,1]      [,2]
+[1,] 1.166013 0.1835017</code></pre>
+</div>
+</div>
+<p>#Week 3</p>
+<p><span class="math inline">\(\mathbb{V}(c^T\hat{\beta})=c^T \text{Cov}(\hat{\beta})c\)</span> when <span class="math inline">\(X\)</span> has full column rank. First 15 pages or so of Week 3 A, including interactive model (Estimation of linear functions of beta and Gauss-Markov Theorem in week 3 A around 15minutes in with R).</p>
+<p>Among all the linera estimators of <span class="math inline">\(c^T\beta\)</span>, a natural question is which is hte best (where best mean minimum variance)? <strong>Gauss-Markov Theorem</strong> says that under the Guass-Markov model, for an estimable <span class="math inline">\(c^T\beta\)</span>, <span class="math inline">\(c^T\hat{\beta}\)</span> is the best linear unbiased estimator (BLUE).</p>
+</section>
+<section id="goodness-of-fit" class="level3">
+<h3 class="anchored" data-anchor-id="goodness-of-fit">Goodness of fit</h3>
+<p>Recall that <span class="math inline">\(\hat{y}=P_Xy\)</span> and <span class="math inline">\(\hat{\epsilon}=(I-P_X)y\)</span>, so <span class="math inline">\(y=\hat{y}+\hat{\epsilon}\)</span>. We can write this for each term as <span class="math inline">\(y_i=\hat{y_i+(y_i-\hat{y_i})}\)</span>, and then <span class="math inline">\(y_i-\overline{y}=(\hat{y_i}-\overline{y})+(y_i-\hat{y_i})\)</span> and so <span class="math inline">\(\sum(y_i-\overline{y})^2=\sum(\hat{y_i}-\overline{y})^2+\sum(y_i-\hat{y_i})^2\)</span>. The <span class="math inline">\(\sum(y_i-\overline{y})^2\)</span> term is called the <strong>total sum of squares (SST)</strong>. The <span class="math inline">\(\sum(\hat{y_i}-\overline{y})^2\)</span> term is called the <strong>regression sum of squares (SSR)</strong> (or sometimes model sum of squares). In an ideal world, you want your residuals, the <span class="math inline">\(y_i-\hat{y_i}\)</span>, to be close to zero. Thus, we want the regression sum of squares to be close to the total sum of squares. The ratio of these two is <span class="math inline">\(r^2=\frac{SSR}{SST}=\frac{\sum(\hat{y_i}-\overline{y})^2}{\sum(y_i-\overline{y})^2}\)</span>. Since the terms in the above quality are all squared, the regression sum of squares can never be more than the total sum of squares, <span class="math inline">\(r^2 \leq 1\)</span>. Similar, since the regression sum of squares can never be negative, <span class="math inline">\(r^2\geq 0\)</span> (if so, there is no fit at all, everything comes from the error terms). We can then interpret <span class="math inline">\(r^2\)</span> to be the proportion of variation captured by the model. Another interpretation of <span class="math inline">\(r^2\)</span> is literally the square of the correlation between the observed and predicted values of <span class="math inline">\(y\)</span>; <span class="math inline">\(r^2=\text{Corr}(y, \hat{y})^2=\left(\frac{\text{Cov}(y, y\hat{y})}{\sqrt{\mathbb{V}(y)\mathbb{V}(\hat{y})}}\right)^2=\left(\frac{\mathbb{E}(y\hat{y})-\mathbb{E}(y)\mathbb{E}(\hat{y})}{\sqrt{\mathbb{V}(y)\mathbb{V}(\hat{y})}}\right)^2\)</span>.</p>
+<p>Let’s go back to our previous example of predicting gambling habits. We want to verify our calculation for <span class="math inline">\(r^2\)</span>, <span class="math inline">\(\frac{\sum(\hat{y_i}-\overline{y})^2}{\sum(y_i-\overline{y})^2}\)</span> matches the output to our model. Note that while <code>summary(gamble_regression)$r.squared</code> directly gives us the computed <span class="math inline">\(r^2\)</span>, we can also read it directly off the second to last line in <code>summary(gamble_regression)</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(faraway)</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>gamble_regression<span class="ot">=</span><span class="fu">lm</span>(gamble<span class="sc">~</span>., <span class="at">data=</span>teengamb)</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>yhat<span class="ot">=</span><span class="fu">predict</span>(gamble_regression)</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>yobs<span class="ot">=</span>teengamb<span class="sc">$</span>gamble</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>yavg<span class="ot">=</span><span class="fu">mean</span>(teengamb<span class="sc">$</span>gamble)</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>SSR<span class="ot">=</span><span class="fu">sum</span>((yhat<span class="sc">-</span>yavg)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>SST<span class="ot">=</span><span class="fu">sum</span>((yobs<span class="sc">-</span>yavg)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>compare_r2<span class="ot">=</span><span class="fu">data.frame</span>(<span class="at">direct=</span>SSR<span class="sc">/</span>SST, <span class="at">lm=</span><span class="fu">summary</span>(gamble_regression)<span class="sc">$</span>r.squared)</span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>compare_r2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     direct        lm
+1 0.5267234 0.5267234</code></pre>
+</div>
+</div>
+</section>
+<section id="addional-assumption-to-gauss-markov" class="level3">
+<h3 class="anchored" data-anchor-id="addional-assumption-to-gauss-markov">Addional Assumption to Gauss-Markov</h3>
+<p>Thus far we have assumed our model <span class="math inline">\(y=X\beta+\epsilon\)</span> is such that <span class="math inline">\(\mathbb{E}(\epsilon)=0\)</span> and <span class="math inline">\(\mathbb{V}(\epsilon)=\sigma^2I\)</span>. From now, on, we’d like to make an additional assumption on the <em>distribution</em> of the errors, namely that <span class="math inline">\(\epsilon \in \mathbb{R}^n\)</span> follows a multivariate normal distribution with mean <span class="math inline">\(0 \in \mathbb{R}^n\)</span> and Covariance matrix <span class="math inline">\(\sigma^2I\)</span> (i.e.&nbsp;<span class="math inline">\(\text{Cov}(\epsilon_i, \epsilon_j)=0\)</span> when <span class="math inline">\(i \neq j\)</span>). In such a model, by the rules of expectation and variance, <span class="math inline">\(y \sim N(X\beta, \sigma^2I)\)</span>. This means that each individual <span class="math inline">\(y_i\)</span> is normal with mean <span class="math inline">\(X\beta_i\)</span> and variance <span class="math inline">\(\sigma^2\)</span>. Using previous results for our least-squares solution in the Gauss-Markov model, if <span class="math inline">\(X\)</span> has full column rank, then under this additional assumption, <span class="math inline">\(\hat{\beta} \sim N(\beta, \sigma^2(X^TX)^{-1})\)</span>.</p>
+<p>XXXXXX WHEN get more time, show with “Week 3- Testing in R” that this is indeed the case (centered at true, variance whatever)XXXXXXXXXXX</p>
+</section>
+<section id="hypothesis-testing-for-single-coefficient-t-test" class="level3">
+<h3 class="anchored" data-anchor-id="hypothesis-testing-for-single-coefficient-t-test">Hypothesis testing for single coefficient (t-test)</h3>
+<p>Our model is <span class="math inline">\(y_i=\beta_0+X\beta_1+\epsilon_i\)</span> where <span class="math inline">\(\epsilon_i \stackrel{iid}{\sim}N(0, \sigma^2)\)</span>. We want to test the hypothesis <span class="math inline">\(H_0: \beta_1=0\)</span> against the alternative <span class="math inline">\(H_a: \beta_1 \neq 0\)</span>. We know that <span class="math inline">\(\hat{\beta_1} \sim N(\beta_1, \sigma^2(X^TX)^{-1}_{2_2})\)</span>. If we standardize <span class="math inline">\(\hat{\beta_1}\)</span> by subtracting the mean and dividing by the standard deviation, we know that <span class="math inline">\(\frac{\hat{\beta_1}-\beta_1}{\text{SE}(\hat{\beta_1})}=\frac{\hat{\beta_1}-\beta_1}{\sqrt{\sigma^2(X^TX)^{-1}_{2_2}}} \sim N(0,1)\)</span>. Unfortunately, this is not easily used since <span class="math inline">\(\sigma^2\)</span> is unknown. Instead, we must estimate it with <span class="math inline">\(\hat{\sigma^2}\)</span>.</p>
+<p>Our statistic of interest then becomes <span class="math inline">\(\frac{\hat{\beta_1}-\beta_1}{\sqrt{\hat{\sigma^2}(X^TX)^{-1}_{2_2}}}\)</span>, and we want to see how this behaves under the assumption that <span class="math inline">\(\beta_1=0\)</span>. This is called our test-statistic, <span class="math inline">\(t=\frac{\hat{\beta_1}}{\hat{\text{SE}}(\hat{\beta_1})}\)</span>. If our null hypothesis that <span class="math inline">\(\beta_1=0\)</span> is really true, then <span class="math inline">\(t\)</span> follows a t-distribution with <span class="math inline">\(n-\text{rank}(X)\)</span> degrees of freedom; <span class="math inline">\(t \sim t_{n-\text{rank}(X)}\)</span>. As would be expected, we reject our null hypothesis in favor of the alternative if <span class="math inline">\(|t|\)</span> is greater than our critical value (where <span class="math inline">\(\alpha\)</span> is our significance level, we reject <span class="math inline">\(H_0\)</span> when <span class="math inline">\(|t| &gt; t_{\frac{\alpha}{2}, n-\text{rank}(X)}\)</span>). Equivalently, we reject when our p-value (the probability of observing data as or more extreme under the null hypothesis) is less than our significance level.</p>
+<p>XXXX when get time look at R-code for t-testXXXx</p>
+</section>
+<section id="hypothesis-testing-for-multiple-parameters-f-test" class="level3">
+<h3 class="anchored" data-anchor-id="hypothesis-testing-for-multiple-parameters-f-test">Hypothesis testing for multiple parameters (F-test)</h3>
 
 
 </section>
