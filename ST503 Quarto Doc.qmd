@@ -280,3 +280,24 @@ Our test statistic is as expected $F=\frac{(K\hat{\beta}-0)^T(K\hat{V}K^T)^{-1}(
 
 xxxxx again go through R when get more timexxxxx
 left off at week 4 part 2
+
+### Confidence Intervals
+
+From earlier work, under the assumption that $c^T\beta$ is estimable, our BLUE is $c^T\hat{\beta}$., which follows a normal distribution with mean $c^T\beta$ and covariance matrix $c^T\sigma^2(X^TX)^-C$. Rescaling gives us a standard normal, $\frac{c^T\hat{\beta}-c^T\beta}{\sqrt{c^TvC}} \sim N(0,1)$ where $V=\sigma^2(X^TX)^-$. Since we don't actually know $\sigma^2$, we estimate it and have $\frac{c^T\hat{\beta}-c^T\beta}{\sqrt{c^T\hat{V}C}} \sim t_{n-\text{rank}(X)}$
+
+If we want to be $95\%$ confident of where this statistic lies, we can look at the symmetry of of the $t$-distribution. We want $2.5\%$ on either side of statistic, so have $\mathbb{P}\left(-k \leq \frac{c^T\hat{\beta}-c^T\beta}{\sqrt{c^T\hat{V}C}} \leq k\right)=0.95$ where $K=t_{0.025, n-\text{rank}(X)}$. Solving for the linear functional, we have $\mathbb{P}(c^T\beta \in \left(c^T\hat{\beta} \pm k\sqrt{c^T\hat{V}c}\right)\right)=0.95$. This is called a $95\%$ **confidence interval** of $c^T\beta$. As expected, we set our confidence level to $1-\alpha$ where $\alpha$ is our significance level/false positive rate/ Type I error rate. Of course, we can use confidence intervals along with hypothesis tests-- if we set our significance level at $5\%$, then it of observed value is in the $95\%$ confidence interval, we fail to reject.  
+
+xxxR example in 
+
+### Prediction Intervals
+
+We have a model $y=X\beta+\epsilon$ where $\epsilon \sim N(0, \sigma^2I)$. Suppose now that we have a new unit. We have the covariates (the predictors $x_i$), but want to predict the response (the $y_i$). It is instinctive that $\mathbb{E}(y_{new} | x_{new})=x_{new}^T\hat{\beta}$, which is our prediction.
+
+There are two sources of variability in our prediction. The first is from the estimate of $\beta$. The second is the randomness in the $y_{\text{new}}$ term, since it has it's own error. What is the distribution of our prediction less our response (the residual)? It is $x_{new}^T\hat{\beta}-y_{new} \sim N(0, X_{new}^TVX_{new}+\sigma^2)$ where $V=\sigma^2(X^TX)^-$. The variance comes from the regular variance rules: $\mathbb{V}(X_{new}^T\hat{\beta}-y_{new})=\mathbb{V}(X_{new}^T\beta)+\mathbb{V}(y_{new})-\text{Cov}(X_{new}^T\hat{\beta}, y_{\text{new}})=X_{\text{new}}^TVX_{\text{new}}+\sigma^2+0$. The covariance is zero since the new error is independent of the existing errors (this is our assumption). This means that the new $y_{\text{new}}$ is independent of the existing $y_i$'s.
+
+We then can reshape and rescale as before-- $\frac{X_{\text{new}}^T\hat{\beta}-y_{\text{new}}}{\sqrt{X_{\text{new}}^TVX_{\text{new}}+\sigma^2}}\sim N(0,1)$ and $\frac{X_{\text{new}}^T\hat{\beta}-y_{\text{new}}}{\sqrt{X_{\text{new}}^T\hat{V}X_{\text{new}}+\sigma^2}}\sim t_{n-\text{rank}(X)}$. We then use this distribution to form our $100(1-\alpha)\%$ prediction interval. Our point estimate is $X_{\text{new}}^T\hat{\beta}$ and our margin of error is $\left(t_{\frac{\alpha}{2}, n-\text{rank}(X)}\right)\sqrt{X_{\text{new}}^T\hat{V}X_{\text{new}}+\hat{\sigma^2}}$. This is much wider than the confidence interval.
+
+# Week 5
+
+Hi
+
