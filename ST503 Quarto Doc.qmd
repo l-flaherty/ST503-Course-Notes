@@ -306,3 +306,13 @@ Our p-value is the proportion of the generated F-stats that exceed our F_obs, di
 
 xxxR codexxx
 
+### Diagnostics I
+We have made four assumptions with our model $y=X\beta+\epsilon$. One, that the errors have constant variance. Two, that the errors are uncorrelated. Three, that the errors are normally distributed. Four, that there is a linear relationship between $x$ and $y$.
+
+We don't actually know the error terms but have to use our residuals as a proxy, $\hat{\epsilon}=y-\hat{y}=(I-P_X)y$. Computing the covariance, we get $\text{Cov}(\hat{\epsilon})=\sigma^2=\sigma^2(I-P_X)$. This is a problem because even if our errors are independent, uncorrelated, and have the same variance,  the variance of the residuals aren't. 
+
+We can plot the residuals on the y axis and fitted values on the x-axis to see if the spread changes based on the predicted fit. We we get a strong trend, then we would likely reject the constant variance assumption.
+
+If that is the case, we move the **generalized least squares solution**. In such a case, we are aiming to minimize $(y-X\beta)^TW(y-X\beta)$ where $W$ is a diagonal matrix with weighted entries. Another option is to consider a transformation of $y$ such as $\log(y), \sqrt{y}, etc.$.
+
+
